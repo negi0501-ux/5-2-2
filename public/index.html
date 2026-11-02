@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>실험 결과 공유하기 - 학생</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>🔬 실험 결과 공유하기</h1><a href="teacher.html" style="color:#fff">교사 화면</a></header>
+<main>
+  <div class="row">
+    <select id="grade"></select><select id="cls"></select>
+    <select id="group"></select>
+    <input id="nick" maxlength="12" placeholder="번호 또는 별명 (이름 X)">
+  </div>
+  <div class="row"><input id="n0" maxlength="10" placeholder="값 A 이름 (예: 온도)"><input id="n1" maxlength="10" placeholder="값 B 이름 (예: 무게)"></div>
+  <table id="tbl"></table>
+  <div class="row">
+    <button id="add">+ 행 추가</button><button id="del">− 행 삭제</button>
+    <button id="send" class="primary">공유하기</button><span id="status"></span>
+  </div>
+  <div class="chart" id="chart"></div>
+  <p style="font-size:12px;color:#666">이름·얼굴·성적은 입력하지 마세요. 데이터는 수업 40분 뒤 자동으로 지워져요.</p>
+</main>
+<script src="common.js"></script>
+<script>
+fillRoomSelects();
+const grp = document.getElementById('group');
+for (let i = 1; i <= 7; i++) grp.add(new Option(i + '모둠', i));
+grp.value = localStorage.getItem('group') || 1;
+document.getElementById('nick').value = localStorage.getItem('nick') || '';
+let rows = [1, 2, 3, 4, 5, 6, 7].map((i) => ({ label: i + '회', a: null, b: null }));
+
+function draw() {
+  const names = [n0.value || '값 A', n1.value || '값 B'];
+  tbl.innerHTML = `<tr><th>항목</th><th>${esc(names[0])}</th><th>${esc(names[1])}</th></tr>` +
+    rows.map((r, i) => `<tr><td><input data-i="${i}" data-k="label" value="${esc(r.label)}" maxlength="10"></td>
+      <td><input inputmode="decimal" data-i="${i}" data-k="a" value="${r.a ?? ''}"></td>
+      <td><input inputmode="decimal" data-i="${i}" data-k="b" value="${r.b ?? ''}"></td></tr>`).join('');
+  preview();
+}
+function preview() { chart.innerHTML = legend({ names: [n0.value || '값 A', n1.value || '값 B'] }) + lineChart(collect()); }
+function collect() {
+  return { rows: rows.map((r) => ({ label: r.label, a: r.a, b: r.b })), names: [n0.value || '값 A', n1.value || '값 B'] };
+}
+tbl.addEventListener('input', (e) => {
+  const { i, k } = e.target.dataset; if (i === undefined) return;
+  const v = e.target.value.trim();
+  rows[i][k] = k === 'label' ? v : v === '' || isNaN(Number(v)) ? null : Number(v);
+  preview();
+});
+[n0, n1].forEach((el) => el.addEventListener('input', draw));
+add.onclick = () => { if (rows.length < 7) rows.push({ label: rows.length + 1 + '회', a: null, b: null }); draw(); };
+del.onclick = () => { if (rows.length > 1) rows.pop(); draw(); };
+send.onclick = async () => {
+  localStorage.setItem('room', roomValue()); localStorage.setItem('group', grp.value); localStorage.setItem('nick', nick.value);
+  const r = await fetch('/api/data', { method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ room: roomValue(), group: grp.value, nickname: nick.value, ...collect() }) });
+  status.textContent = r.ok ? '✅ 교사 화면에 공유했어요 ' + new Date().toLocaleTimeString('ko-KR') : '❌ 공유 실패. 다시 눌러 주세요';
+};
+draw();
+</script></body></html>

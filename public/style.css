@@ -1,0 +1,28 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, 'Malgun Gothic', sans-serif; background: #f5f7fa; color: #222; }
+header { background: #1565c0; color: #fff; padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+header h1 { font-size: 18px; margin: 0 auto 0 0; }
+select, input, button { font-size: 16px; padding: 8px; border-radius: 6px; border: 1px solid #bbb; }
+button { background: #fff; cursor: pointer; }
+button.primary { background: #43a047; color: #fff; border: 0; }
+main { padding: 12px; max-width: 760px; margin: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; background: #fff; }
+th, td { border: 1px solid #ccc; padding: 4px; text-align: center; }
+td input, th input { width: 100%; border: 0; padding: 8px 2px; text-align: center; font-size: 16px; }
+.chart svg { width: 100%; height: auto; background: #fff; border: 1px solid #ddd; }
+.legend { text-align: center; font-size: 13px; font-weight: bold; }
+.empty { padding: 30px 8px; text-align: center; color: #888; background: #fff; border: 1px dashed #ccc; font-size: 13px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+#status { font-size: 13px; color: #2e7d32; }
+/* 교사 화면: 7모둠 동시에 (4 + 3 배치) */
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 8px; }
+.card { background: #fff; border: 2px solid #90caf9; border-radius: 8px; padding: 6px; overflow: hidden; min-width: 0; }
+.card:nth-child(7) { grid-column: 2; }
+@media (max-width: 560px) { .card:nth-child(7) { grid-column: auto; } }
+.card h2 { font-size: 14px; margin: 0 0 4px; }
+.card h2 small { font-weight: normal; color: #666; }
+.card table { font-size: 11px; margin-bottom: 4px; }
+.card .none { color: #999; font-size: 12px; padding: 20px 0; text-align: center; }
+@media (min-width: 900px) { .grid { height: calc(100vh - 56px); grid-template-rows: repeat(3, 1fr); } .card { overflow: auto; } }
+
+@media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
